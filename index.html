@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;min-height:100vh;background:#050f1f;display:flex;align-items:center;justify-content:center;padding:32px 16px}
+    .scene{position:relative;border-radius:20px;overflow:hidden;width:100%;max-width:1000px}
+    .bg{position:absolute;inset:0;background:#050f1f}
+    .bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,216,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,216,.05) 1px,transparent 1px);background-size:40px 40px}
+    .orb1{position:absolute;width:320px;height:320px;border-radius:50%;background:rgba(0,100,180,.18);top:-80px;left:-80px;filter:blur(60px)}
+    .orb2{position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(0,180,216,.13);bottom:-60px;right:60px;filter:blur(50px)}
+    .orb3{position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(83,74,183,.15);top:40%;right:-40px;filter:blur(40px)}
+    .ring{position:absolute;border-radius:50%;border:1px solid rgba(0,180,216,.08)}
+    .r1{width:500px;height:500px;top:-200px;left:-150px}
+    .r2{width:350px;height:350px;bottom:-120px;right:-80px}
+    .r3{width:220px;height:220px;top:30%;right:80px}
+    .content{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1.5fr;min-height:680px}
+
+    /* LEFT PANEL */
+    .left{padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;border-right:0.5px solid rgba(0,180,216,.15)}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+    .brand-icon{width:42px;height:42px;border-radius:10px;background:#00B4D8;display:flex;align-items:center;justify-content:center;color:#050f1f;font-size:22px}
+    .brand-name{font-size:20px;font-weight:600;color:#e2eaf4;letter-spacing:.01em}
+    .left-hero h1{font-size:30px;font-weight:600;color:#f0f6ff;line-height:1.35;margin-bottom:14px}
+    .left-hero p{font-size:17px;color:#7a9abf;line-height:1.75}
+    .cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}
+    .mini-card{background:rgba(255,255,255,.05);border:0.5px solid rgba(0,180,216,.15);border-radius:12px;padding:16px 14px}
+    .mini-num{font-size:26px;font-weight:600;color:#00B4D8;margin-bottom:4px}
+    .mini-lbl{font-size:14.5px;color:#4a6a8a}
+    .trust-list{margin-top:32px;display:flex;flex-direction:column;gap:14px}
+    .trust-item{display:flex;align-items:center;gap:10px;font-size:16px;color:#5a7a9a}
+    .trust-dot{width:8px;height:8px;border-radius:50%;background:#00B4D8;flex-shrink:0}
+    .footer-note{font-size:13.5px;color:#1e3550;margin-top:28px}
+
+    /* RIGHT PANEL */
+    .right{padding:48px 44px;background:rgba(255,255,255,.035);backdrop-filter:blur(2px)}
+    .form-head{margin-bottom:26px}
+    .form-head h2{font-size:26px;font-weight:600;color:#f0f6ff;margin-bottom:7px}
+    .form-head p{font-size:16.5px;color:#5a7a9a}
+    .steps{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+    .step-pill{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#4a7a9a;background:rgba(0,180,216,.07);border:0.5px solid rgba(0,180,216,.18);border-radius:20px;padding:6px 14px}
+    .step-num{width:20px;height:20px;border-radius:50%;background:#00B4D8;color:#050f1f;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sep-line{height:0.5px;background:rgba(0,180,216,.12);margin-bottom:24px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field{margin-bottom:18px}
+    .field label{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#5a8aaa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+    .field input,.field textarea,.field select{width:100%;background:rgba(255,255,255,.06);border:0.5px solid rgba(0,180,216,.18);border-radius:10px;color:#e0eefc;font-size:16px;padding:13px 15px;font-family:'Inter',sans-serif;transition:border-color .15s,box-shadow .15s;outline:none}
+    .field input::placeholder,.field textarea::placeholder{color:#2e4e6a;font-size:15.5px}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:#00B4D8;box-shadow:0 0 0 3px rgba(0,180,216,.12)}
+    .field select{appearance:none;cursor:pointer;color:#e0eefc}
+    .field select option{background:#0d1e35;color:#d8e8f5}
+    .field textarea{min-height:115px;resize:vertical;line-height:1.7}
+    .rating-row{display:flex;gap:7px}
+    .rb{flex:1;background:rgba(255,255,255,.05);border:0.5px solid rgba(0,180,216,.16);border-radius:10px;color:#5a7a9a;font-size:14px;font-weight:600;padding:11px 2px;cursor:pointer;text-align:center;transition:all .15s;font-family:'Inter',sans-serif;line-height:1.3}
+    .rb:hover{border-color:#00B4D8;color:#00B4D8;background:rgba(0,180,216,.08)}
+    .rb.on{background:rgba(0,180,216,.16);border-color:#00B4D8;color:#00d4f5}
+    .bottom-row{display:flex;align-items:center;gap:14px;margin-top:22px}
+    .btn{flex:1;background:#00B4D8;color:#050f1f;border:none;border-radius:10px;font-size:17px;font-weight:600;padding:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif;transition:background .15s,transform .1s;letter-spacing:.01em}
+    .btn:hover{background:#2dd4f2}
+    .btn:active{transform:scale(.98)}
+    .lock-note{font-size:14px;color:#2a4a6a;display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .lock-dot{width:7px;height:7px;border-radius:50%;background:#1a3a5a;flex-shrink:0}
+    #status{margin-top:14px;font-size:15.5px;font-weight:500;text-align:center;min-height:20px;border-radius:10px}
+    #status.ok{background:rgba(0,180,100,.1);border:0.5px solid rgba(0,200,100,.22);color:#22c97a;padding:12px}
+    #status.err{background:rgba(220,60,60,.1);border:0.5px solid rgba(220,60,60,.22);color:#f07070;padding:12px}
+  </style>
+</head>
+<body>
+<div class="scene">
+  <div class="bg"></div>
+  <div class="bg-grid"></div>
+  <div class="orb1"></div><div class="orb2"></div><div class="orb3"></div>
+  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+
+  <div class="content">
+    <!-- LEFT -->
+    <div class="left">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">☁️</div>
+          <span class="brand-name">CloudWithYasApp</span>
+        </div>
+        <div class="left-hero">
+          <h1>We'd love to hear what you think</h1>
+          <p>Your feedback shapes every product decision we make. Takes 2 minutes, makes a real difference.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="mini-card"><div class="mini-num">4.8</div><div class="mini-lbl">Avg rating</div></div>
+          <div class="mini-card"><div class="mini-num">12k+</div><div class="mini-lbl">Responses</div></div>
+          <div class="mini-card"><div class="mini-num">98%</div><div class="mini-lbl">Team read rate</div></div>
+          <div class="mini-card"><div class="mini-num">24h</div><div class="mini-lbl">Avg reply time</div></div>
+        </div>
+        <div class="trust-list">
+          <div class="trust-item"><div class="trust-dot"></div> Private and secure</div>
+          <div class="trust-item"><div class="trust-dot"></div> Never shared with third parties</div>
+          <div class="trust-item"><div class="trust-dot"></div> Every message read by our team</div>
+        </div>
+      </div>
+      <p class="footer-note">© 2025 CloudWithYasApp · All rights reserved</p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+      <div class="form-head">
+        <h2>Share your experience</h2>
+        <p>Fill in the form — we'll follow up if needed.</p>
+      </div>
+      <div class="steps">
+        <div class="step-pill"><div class="step-num">1</div> Your Details</div>
+        <div class="step-pill"><div class="step-num">2</div> Rating</div>
+        <div class="step-pill"><div class="step-num">3</div> Message</div>
+      </div>
+      <div class="sep-line"></div>
+
+      <form id="feedback-form">
+        <div class="row2">
+          <div class="field">
+            <label>Full name</label>
+            <input type="text" id="name" placeholder="Jane Smith" required>
+          </div>
+          <div class="field">
+            <label>Email address</label>
+            <input type="email" id="email" placeholder="jane@example.com" required>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Company</label>
+            <input type="text" id="company" placeholder="Acme Corp">
+          </div>
+          <div class="field">
+            <label>Feedback type</label>
+            <select id="type">
+              <option value="">Select category</option>
+              <option>General feedback</option>
+              <option>Bug report</option>
+              <option>Feature request</option>
+              <option>Support issue</option>
+              <option>Billing question</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Overall rating</label>
+          <div class="rating-row">
+            <button type="button" class="rb" data-v="1">1<br><span style="font-size:12px;font-weight:400;opacity:.8">Poor</span></button>
+            <button type="button" class="rb" data-v="2">2<br><span style="font-size:12px;font-weight:400;opacity:.8">Fair</span></button>
+            <button type="button" class="rb" data-v="3">3<br><span style="font-size:12px;font-weight:400;opacity:.8">Good</span></button>
+            <button type="button" class="rb" data-v="4">4<br><span style="font-size:12px;font-weight:400;opacity:.8">Great</span></button>
+            <button type="button" class="rb" data-v="5">5<br><span style="font-size:12px;font-weight:400;opacity:.8">Excellent</span></button>
+          </div>
+          <input type="hidden" id="rating" value="">
+        </div>
+        <div class="field">
+          <label>Your message</label>
+          <textarea id="message" placeholder="What worked well? What could we improve?" required></textarea>
+        </div>
+        <div class="bottom-row">
+          <button type="submit" class="btn">✈ Send feedback</button>
+          <span class="lock-note"><div class="lock-dot"></div> Secure & private</span>
+          <a href="./admin-dashboard.html" style="
+            position:fixed; bottom:16px; right:16px;
+            font-size:20px; color:#248af0;
+            text-decoration:none;
+            font-family:'Inter',sans-serif;
+          ">Admin ↗</a>
+        </div>
+        <div id="status"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://ovcrwhtord.execute-api.us-east-1.amazonaws.com/prod/feedback';
+
+  document.querySelectorAll('.rb').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.rb').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      document.getElementById('rating').value = b.dataset.v;
+    });
+  });
+
+  document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const st = document.getElementById('status');
+    st.textContent = 'Sending...';
+    st.className = '';
+    const data = {
+      name: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      company: document.getElementById('company').value,
+      type: document.getElementById('type').value,
+      message: document.getElementById('message').value,
+      rating: document.getElementById('rating').value
+    };
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        st.textContent = '✓ Thank you! Your feedback has been received.';
+        st.className = 'ok';
+        e.target.reset();
+        document.querySelectorAll('.rb').forEach(x => x.classList.remove('on'));
+        document.getElementById('rating').value = '';
+      } else {
+        st.textContent = 'Something went wrong — please try again.';
+        st.className = 'err';
+      }
+    } catch {
+      st.textContent = 'Network error — please check your connection.';
+      st.className = 'err';
+    }
+  });
+</script>
+</body>
+</html>
