@@ -1,88 +1,141 @@
-# CloudWithYasApp
-# ☁️ CloudWithYasApp — Real-Time Customer Feedback Platform
+# ☁️ AI-Powered Customer Feedback System
+### Built on AWS · Fully Serverless · Zero Servers to Manage
 
-> A fully serverless customer feedback system built end-to-end on AWS Free Tier.  
-> Customers submit feedback via a hosted form. Owners see live sentiment analytics on a real-time admin dashboard.
+<div align="center">
 
-![AWS](https://img.shields.io/badge/AWS-Serverless-FF9900?style=flat-square&logo=amazon-aws&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
-![DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-4053D6?style=flat-square&logo=amazon-dynamodb&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
-![Free Tier](https://img.shields.io/badge/AWS-100%25%20Free%20Tier-success?style=flat-square)
+![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Lambda](https://img.shields.io/badge/AWS_Lambda-FF9900?style=for-the-badge&logo=awslambda&logoColor=white)
+![DynamoDB](https://img.shields.io/badge/DynamoDB-4053D6?style=for-the-badge&logo=amazondynamodb&logoColor=white)
+![S3](https://img.shields.io/badge/Amazon_S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
+![API Gateway](https://img.shields.io/badge/API_Gateway-FF4F8B?style=for-the-badge&logo=amazonapigateway&logoColor=white)
 
----
+**[🌐 Live Demo](#)** · **[📊 Admin Dashboard](#)** · **[📖 Lab Guide](#)**
 
-## 📖 The Story
+![Project Banner](https://img.shields.io/badge/Capstone-Bootcamp_Week_4-00B4D8?style=for-the-badge)
+![Free Tier](https://img.shields.io/badge/AWS_Free_Tier-✓_Compatible-22C97A?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live-22C97A?style=for-the-badge)
 
-A restaurant owner in Accra stays open until midnight. Customers leave. He has no idea if they'll return.
-
-No feedback system. No data. No second chance to fix what went wrong.
-
-**So I built one.**
-
-CloudWithYasApp is a QR-code-ready customer feedback platform that gives small business owners in Africa and beyond a real-time window into how their customers feel — built entirely on AWS, costing nothing to run.
+</div>
 
 ---
 
-## 🖼️ Project Overview
+## 📌 Overview
 
-| Page | Description |
-|---|---|
-| `feedback.html` | Customer-facing form — name, email, company, category, star rating, message |
-| `admin-dashboard.html` | Owner dashboard — live sentiment charts, rating breakdown, recent submissions feed |
+A production-grade, fully serverless customer feedback collection and AI analysis platform — built as the Week 4 capstone project for the **CloudWithShad AWS Bootcamp**. Customers submit feedback through a redesigned public web form; every submission is automatically analyzed for **sentiment** and **named entities** by Amazon Comprehend, then stored in DynamoDB. A password-protected admin dashboard renders all the data live with interactive charts and a real-time submission feed.
 
-Both pages are hosted as static files on **Amazon S3** and communicate with a single **Lambda function** via **API Gateway REST API**.
+> **No EC2. No containers. No web servers. Runs entirely within the AWS Free Tier.**
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Customer Browser          API Gateway          Lambda Function         DynamoDB
-(feedback.html)    ──►   REST API          ──►  Python 3.12      ──►  cloudwithyas-
-                          POST /feedback        handle_post()          feedback table
-Admin Browser             REST API          ──►  handle_get()    ◄──  (scan all items)
-(admin-dashboard)  ──►   GET  /feedback        returns stats
+┌─────────────────┐     POST /feedback      ┌──────────────────────┐
+│                 │ ──────────────────────► │                      │
+│  Feedback Form  │                         │   API Gateway (REST)  │
+│   (S3 Static)   │ ◄────────────────────── │   prod stage         │
+│                 │     JSON response        │                      │
+└─────────────────┘                         └──────────┬───────────┘
+                                                       │
+                                          Lambda Proxy Integration
+                                                       │
+                                                       ▼
+                                            ┌──────────────────────┐
+                                            │   submitFeedback     │
+                                            │   Lambda (Py 3.12)   │
+                                            └──────┬───────────────┘
+                                                   │
+                                    ┌──────────────┴──────────────┐
+                                    │                             │
+                                    ▼                             ▼
+                        ┌───────────────────┐        ┌───────────────────┐
+                        │  Amazon           │        │  Amazon           │
+                        │  Comprehend       │        │  DynamoDB         │
+                        │                   │        │                   │
+                        │  • Sentiment      │        │  cloudwithshad    │
+                        │  • Entities       │        │  -feedback table  │
+                        └───────────────────┘        └───────────────────┘
+
+┌─────────────────┐     GET /feedback       ┌──────────────────────┐
+│                 │ ──────────────────────► │                      │
+│ Admin Dashboard │                         │   API Gateway (REST)  │
+│  (S3 Static)    │ ◄────────────────────── │                      │
+│  + SHA-256 Auth │     Aggregated JSON      └──────────┬───────────┘
+└─────────────────┘                                    │
+                                                       ▼
+                                            ┌──────────────────────┐
+                                            │  getDashboardData    │
+                                            │  Lambda (Py 3.12)    │
+                                            │                      │
+                                            │  • Scan DynamoDB     │
+                                            │  • Aggregate stats   │
+                                            │  • Top entities      │
+                                            └──────────────────────┘
 ```
-
-### AWS Services Used
-
-| Service | Purpose | Free Tier |
-|---|---|---|
-| **Amazon S3** | Host both static HTML pages | 5 GB storage, 20K GET requests |
-| **API Gateway** | REST API — routes POST and GET to Lambda | 1M API calls/month |
-| **AWS Lambda** | Business logic — save feedback, run sentiment, return analytics | 1M requests + 400K GB-seconds |
-| **Amazon DynamoDB** | NoSQL store for all feedback submissions | 25 GB + 200M requests/month |
-| **IAM** | Role granting Lambda access to DynamoDB and Comprehend | Free |
 
 ---
 
 ## ✨ Features
 
-- **Multi-field feedback form** — name, email, company, feedback type dropdown, 1–5 star rating, free-text message
-- **Keyword-based sentiment analysis** — POSITIVE / NEGATIVE / NEUTRAL, runs inside Lambda with no extra service cost
-- **Real-time admin dashboard** with:
-  - Stat cards (total responses, % positive, avg rating, latest submission)
-  - Animated sentiment donut chart
-  - Star rating distribution bars
-  - Feedback category breakdown
-  - Live submissions feed (last 10, with avatar, sentiment pill, company tag)
-  - Auto-refreshes every 60 seconds
-- **Password-protected dashboard** — SHA-256 hashed password checked in the browser, never stored in plain text
-- **100% AWS Free Tier** — no credit card charges for normal usage
-- **CORS-compliant** — works across S3 and API Gateway with proper preflight handling
-- **DynamoDB pagination** — handles datasets larger than 1MB scan limit
+### 📝 Public Feedback Form
+- Professional two-panel layout with animated dark background (CSS orbs + grid)
+- 5-point interactive rating buttons with active state toggle
+- Feedback type dropdown — General / Bug / Feature / Support / Billing
+- Real-time status banner (green ✓ success / red ✗ error) after submission
+- Fully responsive — works on mobile and desktop
+- Zero dependencies — single HTML file, no npm, no build step
+
+### 📊 Admin Dashboard
+- **SHA-256 password-protected login** — works on both S3 HTTP and CloudFront HTTPS
+- **4 live KPI cards** — total responses, positive %, avg rating, latest submission
+- **Sentiment donut chart** — pure Canvas API, no chart library required
+- **Rating breakdown** — animated 5★ → 1★ horizontal bars
+- **Feedback type breakdown** — counts per category from DynamoDB
+- **Top entity bar chart** — top 10 topics Comprehend extracted, animated bars
+- **Recent submissions feed** — last 10 rows with avatar initials, sentiment pill, rating badge
+- **Auto-refresh every 60 seconds** — always live without manual reload
+
+### 🧠 AI / NLP Pipeline
+- **Sentiment analysis** — POSITIVE / NEGATIVE / NEUTRAL / MIXED with confidence score
+- **Named entity extraction** — automatically surfaces people, places, products, organisations
+- Both powered by **Amazon Comprehend** — no ML model to train or maintain
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Service | Purpose |
+|---|---|---|
+| **Frontend** | Amazon S3 | Static website hosting for both HTML pages |
+| **API** | Amazon API Gateway (REST) | `POST /feedback` · `GET /feedback` |
+| **Compute** | AWS Lambda × 2 | Python 3.12 — submit handler + dashboard handler |
+| **AI / NLP** | Amazon Comprehend | Sentiment analysis + entity extraction |
+| **Database** | Amazon DynamoDB | On-demand NoSQL — zero provisioning |
+| **Security** | AWS IAM | Scoped execution role for both Lambda functions |
+| **Monitoring** | Amazon CloudWatch | Auto-enabled Lambda invocation logs |
+| **CDN (optional)** | Amazon CloudFront | HTTPS + custom domain + edge caching |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-cloudwithyasapp/
+cloudwithyasapp-feedback/
 │
-├── feedback.html           # Customer-facing feedback form
-├── admin-dashboard.html    # Owner analytics dashboard
-├── lambda_function.py      # Single Lambda handling GET + POST
+├── frontend/
+│   ├── feedback-form.html        # Public customer-facing form
+│   └── admin-dashboard.html      # Password-protected admin view
+│
+├── lambda/
+│   ├── submitFeedback/
+│   │   └── lambda_function.py    # POST handler — validation + Comprehend + DynamoDB
+│   └── getDashboardData/
+│       └── lambda_function.py    # GET handler — scan + aggregate + return JSON
+│
+├── docs/
+│   └── architecture.png          # Architecture diagram
+│
 └── README.md
 ```
 
@@ -91,255 +144,217 @@ cloudwithyasapp/
 ## 🚀 Deployment Guide
 
 ### Prerequisites
-- An AWS account (free tier is sufficient)
-- Basic familiarity with the AWS Console
+- An AWS account (Free Tier is sufficient)
+- AWS Console access (no CLI required)
 
----
+### Phase 1 — DynamoDB
 
-### Step 1 — Create DynamoDB Table
-
-1. Go to **DynamoDB** → **Create table**
-2. Table name: `cloudwithyas-feedback`
+1. AWS Console → **DynamoDB** → **Create table**
+2. Table name: `cloudwithshad-feedback`
 3. Partition key: `feedback_id` (String)
-4. Leave all other settings as default → **Create table**
+4. Settings: Default (on-demand capacity) → **Create table**
 
----
+### Phase 2 — IAM Role
 
-### Step 2 — Create IAM Role
-
-1. **IAM** → **Roles** → **Create role**
-2. Trusted entity: **AWS service** → **Lambda** → Next
-3. Attach these policies:
-   - `AWSLambdaBasicExecutionRole`
-   - `ComprehendReadOnly` *(use this, NOT ComprehendFullAccess — free tier compatible)*
+1. **IAM** → **Roles** → **Create role** → AWS service → Lambda
+2. Attach policies:
    - `AmazonDynamoDBFullAccess`
-4. Role name: `cloudwithyas-feedback-role` → **Create role**
+   - `ComprehendFullAccess`
+   - `AWSLambdaBasicExecutionRole`
+3. Role name: `lambda-feedback-role` → **Create role**
 
----
+### Phase 3 — Lambda Functions
 
-### Step 3 — Create Lambda Function
+**Function 1 — submitFeedback**
+```
+Runtime : Python 3.12
+Role    : lambda-feedback-role
+Timeout : 30 seconds  ← important for Comprehend latency
+```
+Paste `lambda/submitFeedback/lambda_function.py` into the code editor → **Deploy**
 
-1. **Lambda** → **Create function** → **Author from scratch**
-2. Function name: `cloudwithyas-process-feedback`
-3. Runtime: **Python 3.12**
-4. Expand *Change default execution role* → **Use an existing role** → select `cloudwithyas-feedback-role`
-5. **Create function**
-6. Paste the contents of `lambda_function.py` into the code editor → **Deploy**
+**Function 2 — getDashboardData**
+```
+Runtime : Python 3.12
+Role    : lambda-feedback-role
+```
+Paste `lambda/getDashboardData/lambda_function.py` into the code editor → **Deploy**
 
----
+### Phase 4 — API Gateway (REST API)
 
-### Step 4 — Create REST API Gateway
-
-1. **API Gateway** → **Create API** → **REST API** → **Build**
-2. Select **New API** · Name: `feedback-api` → **Create API**
-3. **Create resource** → Resource path: `/feedback` → tick **Enable API Gateway CORS** → **Create resource**
-4. Select `/feedback` → **Create method** → `POST` → Lambda proxy integration → select your function → **Save**
-5. Select `/feedback` → **Create method** → `GET` → Lambda proxy integration → select same function → **Save**
-6. Select `/feedback` → **Enable CORS** → confirm `GET, POST, OPTIONS` are listed → **Save**
-7. **Deploy API** → New stage → Stage name: `prod` → **Deploy**
-8. Copy the **Invoke URL** — you will need it in both HTML files
-
-> ⚠️ **Important:** You must redeploy to `prod` after *every* API Gateway change, including CORS updates.
-
----
-
-### Step 5 — Configure HTML Files
-
-In `feedback.html`, find and replace:
-
-```javascript
-const API_URL = 'YOUR_API_GATEWAY_URL_HERE/feedback';
+```
+API type  : REST API (not HTTP API)
+Name      : FeedbackAPI
+Stage     : prod
 ```
 
-Replace with your Invoke URL + `/feedback`:
+| Resource | Method | Integration | CORS |
+|---|---|---|---|
+| `/feedback` | `POST` | Lambda Proxy → `submitFeedback` | ✅ Enabled |
+| `/feedback` | `GET` | Lambda Proxy → `getDashboardData` | ✅ Enabled |
 
-```javascript
-const API_URL = 'https://abc123.execute-api.us-east-1.amazonaws.com/prod/feedback';
+After deploying, copy the **Invoke URL**:
+```
+https://XXXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod
 ```
 
-In `admin-dashboard.html`, find and replace:
+### Phase 5 — Update the HTML files
 
+In `feedback-form.html`:
 ```javascript
-const API_BASE = 'REPLACE_WITH_YOUR_REST_API_BASE_URL/prod';
+const API_URL = 'https://XXXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod/feedback';
 ```
 
-Replace with your Invoke URL (no `/feedback` — the dashboard JS adds it):
-
+In `admin-dashboard.html`:
 ```javascript
-const API_BASE = 'https://abc123.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE = 'https://XXXXXXXXXX.execute-api.us-east-1.amazonaws.com/prod';
 ```
 
----
+### Phase 6 — S3 Static Hosting
 
-### Step 6 — Host on Amazon S3
-
-1. **S3** → **Create bucket** → choose a unique name → **Create**
-2. **Permissions** tab → **Block public access** → uncheck all four boxes → **Save**
-3. **Bucket policy** → **Edit** → paste the policy below (replace `YOUR-BUCKET-NAME`):
+1. Create an S3 bucket (e.g. `cloudwithyasapp-feedback`) — unblock public access
+2. **Properties** → Static website hosting → Enable → Index: `feedback-form.html`
+3. **Permissions** → Bucket policy:
 
 ```json
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadGetObject",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
-    }
-  ]
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+  }]
 }
 ```
 
-4. **Upload** both `feedback.html` and `admin-dashboard.html`
-5. Click each file → **Properties** → copy the **Object URL**
-
-> ⚠️ **Always use the Object URL** (`https://bucket.s3.amazonaws.com/page.html`), NOT the static website hosting URL (`http://bucket.s3-website-...`). The website URL is HTTP-only and will block API calls to your HTTPS API Gateway.
-
----
-
-### Step 7 — Access Your Pages
-
-| Page | URL format |
-|---|---|
-| Feedback form | `https://YOUR-BUCKET.s3.amazonaws.com/feedback.html` |
-| Admin dashboard | `https://YOUR-BUCKET.s3.amazonaws.com/admin-dashboard.html` |
-
----
-
-## 🔐 Dashboard Password Protection
-
-The admin dashboard uses SHA-256 hashing to protect access without exposing your password in source code.
-
-**Generate your hash** — open your browser console (F12) and run:
-
-```javascript
-const encoder = new TextEncoder();
-const data = encoder.encode('your-chosen-password');
-crypto.subtle.digest('SHA-256', data).then(hash => {
-  console.log([...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join(''));
-});
-```
-
-Paste the output into `admin-dashboard.html`:
-
-```javascript
-const ADMIN_HASH = 'paste-your-hash-here';
-```
-
-The real password is never stored in your code — only the irreversible hash.
+4. Upload both HTML files → your site is live at the bucket website endpoint
 
 ---
 
 ## 🗄️ DynamoDB Schema
 
-| Attribute | Type | Notes |
+| Attribute | Type | Description |
 |---|---|---|
-| `feedback_id` | String | Partition key — UUID generated by Lambda |
-| `name` | String | Customer full name |
-| `email` | String | Customer email |
-| `message` | String | Raw feedback text (max 5,000 chars) |
-| `sentiment` | String | `POSITIVE` \| `NEGATIVE` \| `NEUTRAL` |
-| `rating` | String | 1–5 star rating (optional) |
-| `company` | String | Customer company (optional) |
-| `feedback_type` | String | Category from dropdown (optional) |
-| `submitted_at` | String | ISO-8601 UTC timestamp |
+| `feedback_id` | String (PK) | UUID generated by Lambda |
+| `name` | String | Submitter's full name |
+| `email` | String | Submitter's email address |
+| `company` | String | Company name (optional) |
+| `type` | String | Feedback category |
+| `rating` | String | 1–5 star rating |
+| `message` | String | Feedback message (max 5,000 chars) |
+| `sentiment` | String | POSITIVE / NEGATIVE / NEUTRAL / MIXED |
+| `sentiment_score` | String | Comprehend confidence score (0–1) |
+| `entities` | List | Top 10 named entities detected |
+| `submitted_at` | String | ISO 8601 UTC timestamp |
 
 ---
 
-## 🔌 API Reference
+## 💰 AWS Free Tier Cost Breakdown
 
-### `POST /feedback` — Submit feedback
+| Service | Free Allowance | Duration | Estimated Usage |
+|---|---|---|---|
+| Lambda | 1M requests + 400K GB-sec/month | Indefinite | < 1,000 calls/month |
+| DynamoDB | 25 GB + 25 WCU + 25 RCU/month | Indefinite | < 1 GB |
+| API Gateway | 1M calls/month | 12 months | < 10,000 calls/month |
+| Comprehend | 50,000 units/month | 12 months | 2 units per submission |
+| S3 | 5 GB + 20K GET requests/month | 12 months | < 10 MB |
+| CloudWatch | 5 GB ingestion + storage/month | 12 months | Lambda logs only |
 
-**Request body:**
-```json
-{
-  "name":    "Jane Smith",
-  "email":   "jane@example.com",
-  "message": "The service was excellent!",
-  "company": "Acme Corp",
-  "type":    "General feedback",
-  "rating":  "5"
-}
-```
-
-**Response:**
-```json
-{
-  "success":   true,
-  "id":        "a1b2c3d4-...",
-  "sentiment": "POSITIVE"
-}
-```
+> 💡 **Estimated monthly cost at portfolio scale: $0.00**
 
 ---
 
-### `GET /feedback` — Fetch analytics (dashboard)
+## 🔐 Security Notes
 
-**Response:**
-```json
-{
-  "total": 42,
-  "sentiment_breakdown": {
-    "POSITIVE": 30,
-    "NEGATIVE": 5,
-    "NEUTRAL":  7
-  },
-  "recent_all": [ ...all items sorted newest first... ]
-}
-```
+The admin dashboard uses **SHA-256 password hashing** with a pre-computed hash embedded at build time. This solves a specific browser security constraint:
 
----
+> `crypto.subtle` (Web Crypto API) is **only available on HTTPS or localhost**. S3 bucket URLs use plain HTTP — so the native API is blocked. This project includes a **pure-JS SHA-256 fallback** that works on HTTP (S3), HTTPS (CloudFront), and localhost equally.
 
-## 🐛 Troubleshooting
+### Production hardening checklist
 
-| Problem | Fix |
-|---|---|
-| **CORS error on form submit** | API Gateway → `/feedback` → Enable CORS → `GET, POST, OPTIONS` → Save → **redeploy to prod** |
-| **`SubscriptionRequiredException` (Comprehend)** | Use `ComprehendReadOnly` policy, not `ComprehendFullAccess` |
-| **Network error from S3 URL** | Switch from the `http://` website URL to the `https://` Object URL |
-| **API changes have no effect** | You must **Deploy API → prod** after every single change |
-| **`Access Denied` on S3 page** | Check Block Public Access is fully disabled + bucket policy is saved |
-| **Dashboard shows no data** | Confirm GET method exists on `/feedback` + CORS re-enabled + redeployed |
+- [ ] Replace `*` CORS origin with your specific S3/CloudFront domain
+- [ ] Scope IAM policies from FullAccess down to specific resource ARNs
+- [ ] Add Cognito User Pool for proper multi-user authentication
+- [ ] Enable DynamoDB point-in-time recovery
+- [ ] Set Lambda reserved concurrency to prevent runaway Comprehend spend
+- [ ] Configure CloudFront + ACM for HTTPS on a custom domain
 
 ---
 
-## 💡 Key Lessons Learned
+## 🐛 Known Issues & Fixes Applied
 
-1. **CORS requires a redeploy** — enabling CORS in the console does nothing until you deploy to your stage
-2. **HTTP vs HTTPS** — S3 static website hosting is HTTP-only; always use the Object URL for HTTPS
-3. **`ComprehendReadOnly` vs `ComprehendFullAccess`** — both work for `detect_sentiment()`, but only ReadOnly is available without a subscription on new accounts
-4. **One Lambda for everything** — a single function routing on `httpMethod` is cleaner than two separate functions for small projects
-5. **DynamoDB scan pagination** — always handle `LastEvaluatedKey` or your dashboard will miss records once your table exceeds 1MB
+### Login fails silently on S3 HTTP URL
+**Cause:** `crypto.subtle` is `undefined` on plain HTTP  
+**Fix:** Pre-computed SHA-256 hash constant + pure-JS SHA-256 fallback function
+
+### CloudFront returns `AccessDenied`
+**Cause:** Missing default root object + S3 blocking direct object access  
+**Fix:**
+1. CloudFront → General → Default root object: `admin-dashboard.html`
+2. Error pages → Create custom error response: `403` → `/admin-dashboard.html` → `200`
+3. Origins → Switch to Origin Access Control (OAC) → update bucket policy
+
+### Dashboard loads but API returns no data
+**Cause:** `loadData()` was calling wrong endpoint (`/dashboard` instead of `/feedback`)  
+**Fix:** Corrected fetch URL to match the deployed API Gateway route
 
 ---
 
-## 🛠️ Built With
+## 🔭 Future Enhancements
 
-- [AWS Lambda](https://aws.amazon.com/lambda/) — serverless compute
-- [Amazon API Gateway](https://aws.amazon.com/api-gateway/) — REST API layer
-- [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) — NoSQL database
-- [Amazon S3](https://aws.amazon.com/s3/) — static website hosting
-- [Python 3.12](https://www.python.org/) — Lambda runtime
-- [Inter](https://fonts.google.com/specimen/Inter) — UI font
-- [Tabler Icons](https://tabler-icons.io/) — icon set
+- [ ] **SNS Email Alerts** — trigger on every NEGATIVE sentiment submission
+- [ ] **Multi-language support** — Comprehend language detection + Translate before analysis
+- [ ] **Cognito authentication** — replace SHA-256 login with proper user pool
+- [ ] **CloudFront + Route 53** — HTTPS on a custom domain with global edge caching
+- [ ] **GitHub Actions CI/CD** — auto-deploy HTML to S3 on every push to `main`
+- [ ] **AWS CDK / Terraform** — full infrastructure as code, one-command deploys
+- [ ] **Amazon Athena** — SQL analytics over exported DynamoDB data in S3
+- [ ] **Amazon QuickSight** — managed BI dashboard with advanced visualisations
+
+---
+
+## 📸 Screenshots
+
+| Feedback Form | Admin Dashboard |
+|:---:|:---:|
+| *(Add screenshot)* | *(Add screenshot)* |
+
+| Login Page | Sentiment Charts |
+|:---:|:---:|
+| *(Add screenshot)* | *(Add screenshot)* |
+
+> 💡 **Tip:** Take screenshots and drag them into the GitHub issue editor to get a URL, then paste them here.
+
+---
+
+## 📚 Resources
+
+- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
+- [Amazon Comprehend Developer Guide](https://docs.aws.amazon.com/comprehend/)
+- [Amazon DynamoDB Developer Guide](https://docs.aws.amazon.com/dynamodb/)
+- [API Gateway REST API Reference](https://docs.aws.amazon.com/apigateway/)
+- [CloudWithShad Bootcamp](https://cloudwithshad.github.io)
 
 ---
 
 ## 👤 Author
 
-**Yasir** — [@cloudwithshad](https://github.com/cloudwithshad)
+**Yasir** — CloudWithYasApp  
+Built as part of the **CloudWithShad AWS Bootcamp · Week 4 Capstone · May 2026**
 
-Built as part of the AWS Cloud Bootcamp.  
-Designed for small businesses in Accra, Ghana and across Africa.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+[![LinkedIn](www.linkedin.com/in/yasir-abdul-rahaman-07a656178)](#)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github&logoColor=white)](#)
 
 ---
 
-*Built with ☁️ on AWS Free Tier — zero cost, real impact.*
+
+---
+
+<div align="center">
+
+**⭐ If this project helped you, please give it a star!**
+
+*Built with ☁️ on AWS · Powered by Amazon Comprehend AI*
+
+</div>
