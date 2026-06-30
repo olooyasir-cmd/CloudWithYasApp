@@ -129,14 +129,20 @@ jobs:
 
       # Step 9: Invalidate CloudFront cache so changes go live instantly
       #         Skip if CLOUDFRONT_DIST_ID secret is not set or user chose to skip
+      #         Note: secrets cannot be referenced directly inside `if:` conditions,
+      #         so we pass it through env and check the env var instead.
       - name: 🌍 Invalidate CloudFront cache
-        if: |
-          secrets.CLOUDFRONT_DIST_ID != '' &&
-          github.event.inputs.skip_cloudfront != 'yes'
+        if: github.event.inputs.skip_cloudfront != 'yes'
+        env:
+          CLOUDFRONT_DIST_ID: ${{ secrets.CLOUDFRONT_DIST_ID }}
         run: |
-          echo "Creating CloudFront invalidation for distribution: ${{ secrets.CLOUDFRONT_DIST_ID }}"
+          if [ -z "$CLOUDFRONT_DIST_ID" ]; then
+            echo "ℹ️  CLOUDFRONT_DIST_ID not set — skipping CloudFront invalidation"
+            exit 0
+          fi
+          echo "Creating CloudFront invalidation for distribution: $CLOUDFRONT_DIST_ID"
           INVALIDATION_ID=$(aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DIST_ID }} \
+            --distribution-id "$CLOUDFRONT_DIST_ID" \
             --paths "/*" \
             --query 'Invalidation.Id' \
             --output text)
