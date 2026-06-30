@@ -71,6 +71,9 @@ jobs:
           echo "✅ Bucket is accessible"
 
       # Step 4: Upload HTML files (no cache — always serve fresh)
+      # Note: --acl flag removed — modern S3 buckets use "Bucket owner enforced"
+      # Object Ownership setting, which disables ACLs entirely. Public access
+      # is granted via the bucket policy instead (see Phase 6 of the deploy guide).
       - name: 🌐 Upload HTML files
         run: |
           aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }}/ \
@@ -78,8 +81,7 @@ jobs:
             --include "*.html" \
             --cache-control "no-cache, no-store, must-revalidate" \
             --content-type "text/html; charset=utf-8" \
-            --delete \
-            --acl public-read
+            --delete
           echo "✅ HTML files uploaded"
 
       # Step 5: Upload CSS files (cache for 1 hour)
@@ -89,8 +91,7 @@ jobs:
             --exclude "*" \
             --include "*.css" \
             --cache-control "public, max-age=3600" \
-            --content-type "text/css; charset=utf-8" \
-            --acl public-read
+            --content-type "text/css; charset=utf-8"
           echo "✅ CSS files uploaded"
 
       # Step 6: Upload JavaScript files (cache for 1 hour)
@@ -100,8 +101,7 @@ jobs:
             --exclude "*" \
             --include "*.js" \
             --cache-control "public, max-age=3600" \
-            --content-type "application/javascript; charset=utf-8" \
-            --acl public-read
+            --content-type "application/javascript; charset=utf-8"
           echo "✅ JavaScript files uploaded"
 
       # Step 7: Upload any images or assets (cache for 7 days)
@@ -115,8 +115,7 @@ jobs:
             --include "*.svg" \
             --include "*.ico" \
             --include "*.webp" \
-            --cache-control "public, max-age=604800" \
-            --acl public-read
+            --cache-control "public, max-age=604800"
           echo "✅ Assets uploaded"
 
       # Step 8: Print summary of what's in the bucket
