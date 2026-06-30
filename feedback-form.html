@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Customer Feedback – CloudWithYasApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="feedback-form.css">
+</head>
+<body>
+<div class="scene">
+  <div class="bg"></div>
+  <div class="bg-grid"></div>
+  <div class="orb1"></div><div class="orb2"></div><div class="orb3"></div>
+  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+
+  <div class="content">
+    <div class="left">
+      <div>
+        <div class="brand">
+          <div class="brand-icon"><i class="ti ti-cloud"></i></div>
+          <span class="brand-name">CloudWithYasApp</span>
+        </div>
+        <div class="left-hero">
+          <h1>We'd love to hear what you think</h1>
+          <p>Your feedback shapes every product decision we make. Takes 2 minutes, makes a real difference.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="mini-card"><div class="mini-num">4.8</div><div class="mini-lbl">Avg rating</div></div>
+          <div class="mini-card"><div class="mini-num">12k+</div><div class="mini-lbl">Responses</div></div>
+          <div class="mini-card"><div class="mini-num">98%</div><div class="mini-lbl">Team read rate</div></div>
+          <div class="mini-card"><div class="mini-num">24h</div><div class="mini-lbl">Avg reply time</div></div>
+        </div>
+        <div class="trust-list">
+          <div class="trust-item"><i class="ti ti-lock"></i> Private and secure</div>
+          <div class="trust-item"><i class="ti ti-eye-off"></i> Never shared with third parties</div>
+          <div class="trust-item"><i class="ti ti-message-check"></i> Every message read by our team</div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-note">© 2025 CloudWithYasApp · All rights reserved</p>
+        <a href="admin-dashboard.html" class="admin-link">
+          <i class="ti ti-layout-dashboard"></i> Admin Dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="form-head">
+        <h2>Share your experience</h2>
+        <p>Fill in the form — we'll follow up if needed.</p>
+      </div>
+      <div class="steps">
+        <div class="step-pill"><i class="ti ti-user"></i> Details</div>
+        <div class="step-pill"><i class="ti ti-star"></i> Rating</div>
+        <div class="step-pill"><i class="ti ti-message"></i> Message</div>
+      </div>
+      <div class="sep-line"></div>
+
+      <form id="feedback-form">
+        <div class="row2">
+          <div class="field">
+            <label><i class="ti ti-user"></i> Full name</label>
+            <input type="text" id="name" placeholder="Jane Smith" required>
+          </div>
+          <div class="field">
+            <label><i class="ti ti-mail"></i> Email</label>
+            <input type="email" id="email" placeholder="jane@example.com" required>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label><i class="ti ti-building"></i> Company</label>
+            <input type="text" id="company" placeholder="Acme Corp">
+          </div>
+          <div class="field">
+            <label><i class="ti ti-category"></i> Feedback type</label>
+            <select id="type">
+              <option value="">Select category</option>
+              <option>General feedback</option>
+              <option>Bug report</option>
+              <option>Feature request</option>
+              <option>Support issue</option>
+              <option>Billing question</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label><i class="ti ti-star"></i> Overall rating</label>
+          <div class="rating-row">
+            <button type="button" class="rb" data-v="1">1 · Poor</button>
+            <button type="button" class="rb" data-v="2">2 · Fair</button>
+            <button type="button" class="rb" data-v="3">3 · Good</button>
+            <button type="button" class="rb" data-v="4">4 · Great</button>
+            <button type="button" class="rb" data-v="5">5 · Excellent</button>
+          </div>
+          <input type="hidden" id="rating" value="">
+        </div>
+        <div class="field">
+          <label><i class="ti ti-message"></i> Your message</label>
+          <textarea id="message" placeholder="What worked well? What could we improve?" required></textarea>
+        </div>
+        <div class="bottom-row">
+          <button type="submit" class="btn"><i class="ti ti-send"></i> Send feedback</button>
+          <span class="lock-note"><i class="ti ti-shield-check"></i> Secure & private</span>
+        </div>
+        <div id="status"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="feedback-form.js"></script>
+</body>
+</html>
