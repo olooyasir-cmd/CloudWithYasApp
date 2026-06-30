@@ -130,8 +130,12 @@ jobs:
       #         Skip if CLOUDFRONT_DIST_ID secret is not set or user chose to skip
       #         Note: secrets cannot be referenced directly inside `if:` conditions,
       #         so we pass it through env and check the env var instead.
+      #         continue-on-error: true — CloudFront is a nice-to-have. If the IAM
+      #         user is missing cloudfront:CreateInvalidation, S3 has still deployed
+      #         successfully, so we don't want this to fail the whole pipeline.
       - name: 🌍 Invalidate CloudFront cache
         if: github.event.inputs.skip_cloudfront != 'yes'
+        continue-on-error: true
         env:
           CLOUDFRONT_DIST_ID: ${{ secrets.CLOUDFRONT_DIST_ID }}
         run: |
@@ -140,11 +144,18 @@ jobs:
             exit 0
           fi
           echo "Creating CloudFront invalidation for distribution: $CLOUDFRONT_DIST_ID"
-          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+          if ! INVALIDATION_ID=$(aws cloudfront create-invalidation \
             --distribution-id "$CLOUDFRONT_DIST_ID" \
             --paths "/*" \
             --query 'Invalidation.Id' \
-            --output text)
+            --output text 2>&1); then
+            echo "⚠️  CloudFront invalidation failed — S3 files are still updated correctly."
+            echo "⚠️  Likely cause: IAM user is missing 'cloudfront:CreateInvalidation' permission."
+            echo "⚠️  Fix: AWS Console → IAM → Users → your deploy user → Add permissions →"
+            echo "⚠️         attach a policy allowing cloudfront:CreateInvalidation on '*'"
+            echo "⚠️  Error detail: $INVALIDATION_ID"
+            exit 0
+          fi
           echo "✅ CloudFront invalidation created: $INVALIDATION_ID"
           echo "ℹ️  Changes will be live globally in ~30–60 seconds"
 
