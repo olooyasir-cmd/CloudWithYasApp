@@ -1,6 +1,6 @@
 // ✅ STEP: Replace this with your REST API invoke URL after deployment
 // Format: https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod/feedback
-const API_URL = 'REPLACE_WITH_YOUR_REST_API_URL/prod/feedback';
+const API_URL = 'https://ovcrwhtord.execute-api.us-east-1.amazonaws.com/prod/feedback';
 
 document.querySelectorAll('.rb').forEach(b => {
   b.addEventListener('click', () => {
